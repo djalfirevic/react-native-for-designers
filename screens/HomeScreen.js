@@ -20,6 +20,9 @@ import Avatar from "../components/Avatar";
 import ApolloClient from "apollo-boost";
 import gql from "graphql-tag";
 import { Query } from "react-apollo";
+import ModalLogin from "../components/ModalLogin";
+import NotificationButton from "../components/NotificationButton";
+import Notifications from "../components/Notifications";
 
 const CardsQuery = gql`
   {
@@ -64,6 +67,14 @@ function mapDispatchToProps(dispatch) {
     openMenu: () =>
       dispatch({
         type: "OPEN_MENU"
+      }),
+    openLogin: () =>
+      dispatch({
+        type: "OPEN_LOGIN"
+      }),
+    openNotif: () =>
+      dispatch({
+        type: "OPEN_NOTIF"
       })
   };
 }
@@ -116,10 +127,19 @@ class HomeScreen extends React.Component {
     }
   };
 
+  handleAvatar = () => {
+    if (this.props.name !== "Stranger") {
+      this.props.openMenu();
+    } else {
+      this.props.openLogin();
+    }
+  };
+
   render() {
     return (
       <RootView>
         <Menu />
+        <Notifications />
         <AnimatedContainer
           style={{
             transform: [{ scale: this.state.scale }],
@@ -130,16 +150,19 @@ class HomeScreen extends React.Component {
             <ScrollView style={{ height: "100%" }}>
               <TitleBar>
                 <TouchableOpacity
-                  onPress={this.props.openMenu}
+                  onPress={this.handleAvatar}
                   style={{ position: "absolute", top: 0, left: 20 }}
                 >
                   <Avatar />
                 </TouchableOpacity>
                 <Title>Welcome back,</Title>
                 <Name>{this.props.name}</Name>
-                <NotificationIcon
+                <TouchableOpacity
+                  onPress={() => this.props.openNotif()}
                   style={{ position: "absolute", right: 20, top: 5 }}
-                />
+                >
+                  <NotificationButton />
+                </TouchableOpacity>
               </TitleBar>
               <ScrollView
                 style={{
@@ -166,7 +189,7 @@ class HomeScreen extends React.Component {
                     if (loading) return <Message>Loading...</Message>;
                     if (error) return <Message>Error...</Message>;
 
-                    console.log(data.cardsCollection.items);
+                    // console.log(data.cardsCollection.items);
 
                     return (
                       <CardsContainer>
@@ -212,6 +235,7 @@ class HomeScreen extends React.Component {
             </ScrollView>
           </SafeAreaView>
         </AnimatedContainer>
+        <ModalLogin />
       </RootView>
     );
   }
